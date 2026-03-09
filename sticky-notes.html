@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Notes App</title>
+    <style>
+        /* CSS */
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f4f4f9;
+            padding: 2rem;
+            margin: 0;
+        }
+
+        #add-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        #add-btn:hover { background-color: #0056b3; }
+
+        .notes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .note {
+            background-color: #fffacd; /* Sticky note yellow */
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .note textarea {
+            width: 100%;
+            height: 150px;
+            border: none;
+            background: transparent;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none; /* Hidden by default, shown on hover */
+        }
+
+        .note:hover .delete-btn { display: block; }
+    </style>
+</head>
+<body>
+
+    <h1>Sticky Notes</h1>
+    <button id="add-btn">+ Add New Note</button>
+    <div class="notes-container" id="notes-container"></div>
+
+    <script>
+        const notesContainer = document.getElementById('notes-container');
+        const addBtn = document.getElementById('add-btn');
+
+        // Helper functions for localStorage
+        const getNotes = () => JSON.parse(localStorage.getItem('sticky-notes') || '[]');
+        const saveNotes = (notes) => localStorage.setItem('sticky-notes', JSON.stringify(notes));
+
+        // Create a single note DOM element
+        function createNoteElement(id, content) {
+            const noteDiv = document.createElement('div');
+            noteDiv.classList.add('note');
+
+            const textarea = document.createElement('textarea');
+            textarea.value = content;
+            textarea.placeholder = "Write something...";
+            
+            // Save on every keystroke
+            textarea.addEventListener('input', () => updateNote(id, textarea.value));
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.innerText = 'X';
+            
+            // Delete note functionality
+            deleteBtn.addEventListener('click', () => {
+                deleteNote(id);
+                noteDiv.remove(); // Remove from DOM
+            });
+
+            noteDiv.appendChild(textarea);
+            noteDiv.appendChild(deleteBtn);
+            return noteDiv;
+        }
+
+        // Initial render
+        function renderNotes() {
+            notesContainer.innerHTML = '';
+            const notes = getNotes();
+            notes.forEach(note => {
+                notesContainer.appendChild(createNoteElement(note.id, note.content));
+            });
+        }
+
+        // Add note logic
+        function addNote() {
+            const notes = getNotes();
+            const newNote = { 
+                id: Date.now().toString(), // Unique ID based on timestamp
+                content: '' 
+            };
+            notes.push(newNote);
+            saveNotes(notes);
+            notesContainer.appendChild(createNoteElement(newNote.id, newNote.content));
+        }
+
+        // Update note logic
+        function updateNote(id, newContent) {
+            const notes = getNotes();
+            const targetNote = notes.find(n => n.id === id);
+            if (targetNote) {
+                targetNote.content = newContent;
+                saveNotes(notes);
+            }
+        }
+
+        // Delete note logic
+        function deleteNote(id) {
+            const notes = getNotes().filter(n => n.id !== id);
+            saveNotes(notes);
+        }
+
+        // Event Listeners
+        addBtn.addEventListener('click', addNote);
+
+        // Load notes on startup
+        renderNotes();
+    </script>
+</body>
+</html>
