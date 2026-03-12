@@ -1,0 +1,50 @@
+body{
+font-family: Arial, Helvetica, sans-serif;
+background:#eef2f7;
+text-align:center;
+margin:0;
+padding:20px;
+}
+
+h1{
+margin-bottom:30px;
+}
+
+.weather-container{
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.card{
+background:white;
+padding:20px;
+width:220px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,0.15);
+transition:transform 0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.city{
+font-size:22px;
+font-weight:bold;
+}
+
+.temp{
+font-size:32px;
+margin:10px 0;
+}
+
+.emoji{
+font-size:40px;
+}
+
+.loading{
+font-size:18px;
+margin-bottom:20px;
+}
